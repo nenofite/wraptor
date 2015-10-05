@@ -2,7 +2,7 @@
 -- Wrap paragraphs of text along word boundaries while preserving line
 -- prefixs.
 --
--- @module smartwrap
+-- @module wraptor
 local M = {}
 
 local lpeg = require 'lpeg'
