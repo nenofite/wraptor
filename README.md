@@ -1,6 +1,6 @@
 # Wraptor
 
-Wraptor brings intelligent text-wrapping to Textadept.
+Wraptor brings intelligent text-wrapping to [Textadept](http://foicica.com/textadept/).
 
 ## Installation
 
