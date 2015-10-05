@@ -1,3 +1,10 @@
+---
+-- Wrap paragraphs of text along word boundaries while preserving line
+-- prefixs.
+--
+-- @module smartwrap
+local M = {}
+
 local lpeg = require 'lpeg'
 
 ---
@@ -14,7 +21,7 @@ local lpeg = require 'lpeg'
 --
 -- @tparam boolean optional (optional) Whether the argument is optional. If
 -- the argument is optional, then nil is an accepted value. Defaults to false.
-function arg(name, arg, expected_type, optional)
+local function arg(name, arg, expected_type, optional)
   local bad = type(arg) ~= expected_type
   
   if bad and optional and arg == nil then
@@ -39,7 +46,7 @@ end
 -- @tparam string text The text to split.
 --
 -- @treturn table A list of lines, none of which contain newlines.
-function split_lines(text)
+function M.split_lines(text)
   local result = {}
 
   local start_index = 1
@@ -68,7 +75,7 @@ end
 -- must be at least 2.
 --
 -- @treturn table A list of lines of text.
-function wrap_text(text, max_line_length)
+function M.wrap_text(text, max_line_length)
   arg('text', text, 'string')
   arg('max_line_length', max_line_length, 'number')
   
@@ -131,7 +138,7 @@ local line_prefix_peg = lpeg.C(
 -- contain no newlines.
 --
 -- @treturn string The prefix of the given line.
-function extract_prefix(line)
+function M.extract_prefix(line)
   arg('line', line, 'string')
   
   return line_prefix_peg:match(line)
@@ -144,10 +151,10 @@ end
 -- still contains the prefix.
 --
 -- @tparam string prefix The prefix of this line, extracted by the function
--- @{extract_prefix}.
+-- @{M.extract_prefix}.
 --
 -- @treturn boolean Whether the line could be part of a paragraph.
-function is_within_paragraph(line, prefix)
+function M.is_within_paragraph(line, prefix)
   arg('line', line, 'string')
   arg('prefix', prefix, 'string')
 
@@ -166,11 +173,11 @@ end
 -- @tparam number max_line_length The maximum length of a line of text.
 --
 -- @treturn string The wrapped text.
-function wrap_paragraphs(text, max_line_length)
+function M.wrap_paragraphs(text, max_line_length)
   arg('text', text, 'string')
   arg('max_line_length', max_line_length, 'number')
 
-  local lines = split_lines(text)
+  local lines = M.split_lines(text)
   
   local result_lines = {}
   
@@ -181,8 +188,8 @@ function wrap_paragraphs(text, max_line_length)
   while i <= num_lines do
     local line = lines[i]
   
-    local prefix = extract_prefix(line)
-    if is_within_paragraph(line, prefix) then
+    local prefix = M.extract_prefix(line)
+    if M.is_within_paragraph(line, prefix) then
       -- If the line is a paragraph, loop through the remaining lines until we find
       -- the end of the paragraph or the end of the input text. Remove the prefix
       -- from each line and add it to a temporary buffer.
@@ -190,8 +197,8 @@ function wrap_paragraphs(text, max_line_length)
       while i <= num_lines do
         line = lines[i]
         
-        local prefix2 = extract_prefix(line)
-        if is_within_paragraph(line, prefix2) then
+        local prefix2 = M.extract_prefix(line)
+        if M.is_within_paragraph(line, prefix2) then
           paragraph = paragraph .. '\n' .. string.sub(line, #prefix2 + 1)
           i = i + 1
         else
@@ -202,7 +209,7 @@ function wrap_paragraphs(text, max_line_length)
       
       -- Wrap the buffer, discounting the length of the prefix from the maximum
       -- line length.
-      local wrapped_lines = wrap_text(paragraph, max_line_length - #prefix)
+      local wrapped_lines = M.wrap_text(paragraph, max_line_length - #prefix)
       
       -- Loop through the results of the wrap, prepending them with the prefix and
       -- adding the resulting line to our results.
@@ -230,3 +237,19 @@ function wrap_paragraphs(text, max_line_length)
   
   return result
 end
+
+---
+-- Wrap the text that is currently selected in Textadept.
+function M.wrap_selection()
+  local original_text = buffer:get_sel_text()
+  
+  local start = buffer.selection_start
+  local length = buffer.selection_end - start
+  
+  local wrapped = M.wrap_paragraphs(original_text)
+  
+  buffer:delete_range(start, length)
+  buffer:insert_text(-1, wrapped)
+end
+
+return M
