@@ -9,7 +9,7 @@ module:
 
 ```sh
 cd ~/.textadept/modules
-git clone git@github.com:nenofite/wraptor.git
+git clone https://github.com/nenofite/wraptor.git
 ```
 
 To activate, add these lines to your `~/.textadept/init.lua` file:
