@@ -1,11 +1,16 @@
 ---
 -- Wrap paragraphs of text along word boundaries while preserving line
--- prefixs.
+-- prefixes.
 --
 -- @module wraptor
 local M = {}
 
-local lpeg = require 'lpeg'
+-- Uncomment this line when running unit tests.
+--local lpeg = require 'lpeg'
+
+---
+-- The maximum length of a line of text when wrapping.
+M.max_line_length = 80
 
 ---
 -- Check whether the given argument is of the expected type, throwing an error
@@ -246,10 +251,12 @@ function M.wrap_selection()
   local start = buffer.selection_start
   local length = buffer.selection_end - start
   
-  local wrapped = M.wrap_paragraphs(original_text)
+  local wrapped = M.wrap_paragraphs(original_text, M.max_line_length)
   
+  buffer:begin_undo_action()
   buffer:delete_range(start, length)
   buffer:insert_text(-1, wrapped)
+  buffer:end_undo_action()
 end
 
 return M

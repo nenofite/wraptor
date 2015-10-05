@@ -1,6 +1,6 @@
 require('busted.runner')()
 
-wraptor = require 'wraptor'
+wraptor = require 'init'
 
 local long_text = [[
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus porttitor, ante eget cursus varius, dui odio placerat lacus, a ultricies nisl purus non mauris. Sed fermentum leo ipsum, eu fringilla libero ullamcorper id. Nullam vitae magna aliquam, placerat tortor ut, semper tortor. Nulla porttitor lobortis hendrerit. Nam eget lectus luctus, pellentesque dolor eu, dignissim nisi. Suspendisse commodo accumsan mi, eget suscipit tortor ultrices id. Maecenas interdum interdum augue, at dapibus nisl. Sed at dolor ut odio imperdiet semper. Morbi sed est eu ante pharetra ultricies eget faucibus urna. Praesent at bibendum lacus, quis sagittis massa. Duis ac vestibulum enim. Nulla.]]
